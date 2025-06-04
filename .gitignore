@@ -1,0 +1,50 @@
+# Загальні файли
+.DS_Store
+.env
+.env.backup
+.env.production
+.env.testing
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+npm-debug.log
+Thumbs.db
+yarn-error.log
+*.log
+*.sql
+
+# Laravel-specific
+storage/framework/*
+!storage/framework/.gitignore
+storage/logs/*
+!storage/logs/.gitignore
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+storage/telescope/*
+!storage/telescope/.gitignore
+
+# Docker-specific
+/docker/
+docker-compose.lock
+/mysql/
+/vendor/laravel/sail/runtimes/*/Dockerfile
+/vendor/laravel/sail/database/mysql/create-testing-database.sh
+
+# IDE and editor files
+*.swp
+*.swo
