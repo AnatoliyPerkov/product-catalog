@@ -14,6 +14,11 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property float $price
  * @property string|null $description
+ * @property string|null $description_format
+ * @property string|null $vendor_code
+ * @property string|null $barcode
+ * @property bool $available
+ * @property string $currency
  * @property int $brand_id
  * @property int $category_id
  * @property int $stock
@@ -26,7 +31,20 @@ use Illuminate\Support\Carbon;
  */
 class Product extends Model
 {
-    protected $fillable = ['external_id', 'name', 'price', 'description', 'brand_id', 'category_id', 'stock'];
+    protected $fillable = [
+        'external_id',
+        'name',
+        'price',
+        'stock',
+        'description',
+        'description_format',
+        'vendor_code',
+        'barcode',
+        'available',
+        'currency',
+        'brand_id',
+        'category_id',
+    ];
 
     public function brand(): BelongsTo
     {
