@@ -51,6 +51,11 @@ return [
     */
 
     'channels' => [
+        'import' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/import.log'),
+            'level' => 'info',
+        ],
 
         'stack' => [
             'driver' => 'stack',
