@@ -6,7 +6,7 @@ use App\Contracts\ProductRepositoryInterface;
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class EloquentProductRepository implements ProductRepositoryInterface
+class ProductRepository implements ProductRepositoryInterface
 {
     /**
      * @param array|null $productIds
