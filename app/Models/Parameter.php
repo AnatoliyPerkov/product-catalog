@@ -23,7 +23,7 @@ class Parameter extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_parameters')
-            ->withPivot('value')
+            ->withPivot(['value', 'value_slug'])
             ->withTimestamps();
     }
 }

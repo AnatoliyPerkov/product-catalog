@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('parameter_id')->constrained()->onDelete('cascade');
             $table->string('value', 255);
+            $table->string('value_slug')->nullable();
             $table->timestamps();
 
             $table->index('value');
