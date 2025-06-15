@@ -17,6 +17,11 @@ class ImportProducts extends Command
     protected $signature = 'import:products {file : The path to the XML file}';
     protected $description = 'Import products and categories from an XML file';
 
+    /**
+     * Основний метод виконання команди, який обробляє імпорт XML-файлу
+     * Перевіряє файл, парсить категорії та товари, зберігає їх у БД та оновлює Redis
+     * @return int Код завершення (0 - успіх, 1 - помилка)
+     */
     public function handle(): int
     {
         $file = $this->argument('file');
@@ -125,10 +130,12 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param $categoryXml
-     * @return array
+     * Парсить XML категорії та повертає масив із даними
+     * Витягує ID, назву та ID батьківської категорії
+     * @param string $categoryXml XML-рядок категорії
+     * @return array Дані категорії
      */
-    private function parseCategory($categoryXml)
+    private function parseCategory($categoryXml): array
     {
         $xml = simplexml_load_string($categoryXml);
         $categoryData = [
@@ -141,9 +148,11 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param $categories
+     * Зберігає категорії в БД та кешує їх нащадків у Redis
+     * Перевіряє конфлікти з брендами, встановлює батьківські зв’язки та створює унікальні слага
+     * @param array $categories Масив даних категорій
      */
-    private function saveCategories($categories)
+    private function saveCategories($categories): void
     {
         $parentIds = array_filter(array_column($categories, 'parent_id'));
         $redis = Redis::connection();
@@ -209,8 +218,10 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param $productXml
-     * @return array
+     * Парсить XML товару та повертає масив із даними
+     * Витягує всі основні поля, зображення та параметри товару
+     * @param string $productXml XML-рядок товару
+     * @return array Дані товару
      */
     private function parseProduct($productXml): array
     {
@@ -258,8 +269,9 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param $data
-     * @return bool
+     * Валідує дані товару, перевіряючи наявність обов’язкових полів
+     * @param array $data Дані товару
+     * @return bool Чи валідні дані
      */
     private function validateProduct($data): bool
     {
@@ -276,9 +288,11 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param $data
+     * Зберігає товар у БД разом із брендом, зображеннями та параметрами
+     * Створює або оновлює бренд, товар, додає зображення та прив’язує параметри
+     * @param array $data Дані товару
      */
-    private function saveProduct($data)
+    private function saveProduct($data): void
     {
         $brand = Brand::firstOrCreate(
             ['slug' => Str::slug($data['vendor'], '_')],
@@ -351,7 +365,11 @@ class ImportProducts extends Command
         }
     }
 
-    private function updateRedisSets()
+    /**
+     * Оновлює множини в Redis для фільтрів брендів, категорій та параметрів
+     * Видаляє старі ключі та створює нові для швидкого пошуку товарів за фільтрами
+     */
+    private function updateRedisSets(): void
     {
         $redis = Redis::connection();
         $redis->del($redis->keys('filter:*'));
@@ -466,8 +484,10 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param Category $category
-     * @return array
+     * Отримує ID всіх нащадків категорії
+     * Використовується для кешування та зв’язків у фільтрах
+     * @param Category $category Об’єкт категорії
+     * @return array Масив ID нащадків
      */
     private function getAllDescendantIds(Category $category): array
     {
@@ -480,8 +500,10 @@ class ImportProducts extends Command
     }
 
     /**
-     * @param string $value
-     * @return string
+     * Нормалізує значення фільтрів (наприклад, матеріали чи кольори)
+     * Застосовує конфігураційні словники та форматує значення
+     * @param string $value Вхідне значення
+     * @return string Нормалізоване значення
      */
     private function normalizeFilterValue(string $value): string
     {

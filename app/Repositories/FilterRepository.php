@@ -17,9 +17,10 @@ class FilterRepository implements FilterRepositoryInterface
     use RedisCache, EntityResolver;
 
     /**
-     * Get all descendant category IDs recursively.
-     * @param Category $category
-     * @return array
+     * Отримує ID всіх нащадків категорії рекурсивно
+     * Використовує кеш Redis для прискорення, повертає масив унікальних ID
+     * @param Category $category Об’єкт категорії
+     * @return array Масив ID нащадків
      */
     protected function getAllDescendantIds(Category $category): array
     {
@@ -42,9 +43,10 @@ class FilterRepository implements FilterRepositoryInterface
     }
 
     /**
-     * Get product IDs based on filters using Redis.
-     * @param array $filters
-     * @return array
+     * Отримує ID продуктів на основі фільтрів, використовуючи Redis
+     * Кешує результати та повертає масив ID продуктів
+     * @param array $filters Масив фільтрів
+     * @return array Масив ID продуктів
      */
     public function getProductIds(array $filters): array
     {
@@ -78,13 +80,15 @@ class FilterRepository implements FilterRepositoryInterface
             return [];
         }
     }
+
     /**
-     * Get product count for a filter value using Redis set intersections.
-     * @param string $paramSlug
-     * @param string $value
-     * @param array|null $activeIds
-     * @param array $filters
-     * @return int
+     * Отримує кількість продуктів для певного значення фільтра
+     * Використовує Redis для обчислення перетинів множин, кешує результати
+     * @param string $paramSlug Слаг параметра
+     * @param string $value Значення фільтра
+     * @param array|null $activeIds Активні ID продуктів
+     * @param array $filters Додаткові фільтри
+     * @return int Кількість продуктів
      */
     public function getProductCount(string $paramSlug, string $value, ?array $activeIds = null, array $filters = []): int
     {
@@ -135,12 +139,14 @@ class FilterRepository implements FilterRepositoryInterface
             return 0;
         }
     }
+
     /**
-     * Process filter values for categories or brands.
-     * @param string $type
-     * @param array $filters
-     * @param array $activeIds
-     * @return array
+     * Обробляє значення фільтрів для категорій або брендів
+     * Повертає структурований масив із даними про фільтри та їх кількість
+     * @param string $type Тип фільтра (category або brand)
+     * @param array $filters Активні фільтри
+     * @param array $activeIds ID активних продуктів
+     * @return array Дані фільтрів
      */
     protected function processFilterValues(string $type, array $filters, array $activeIds): array
     {
@@ -218,12 +224,15 @@ class FilterRepository implements FilterRepositoryInterface
         }
 
         return $result;
-    }    /**
-     * Process parameter filter values from Redis with caching, limited to subcategory products.
-     * @param string $paramSlug
-     * @param array $filters
-     * @param array $activeIds
-     * @return array
+    }
+
+    /**
+     * Обробляє значення параметрів фільтрів із Redis, обмежуючись продуктами підкатегорій
+     * Кешує результати та повертає структурований масив із параметрами
+     * @param string $paramSlug Слаг параметра
+     * @param array $filters Активні фільтри
+     * @param array $activeIds ID активних продуктів
+     * @return array Дані параметрів фільтрів
      */
     protected function processParameterFilterValues(string $paramSlug, array $filters, array $activeIds): array
     {
@@ -314,12 +323,13 @@ class FilterRepository implements FilterRepositoryInterface
         Redis::setex($cacheKey, 300, json_encode($result));
         return $result;
     }
+
     /**
-     * Get available filter values with counts.
-     * Parameters are included if a subcategory is selected or parameters are applied.
-     * @param string $paramSlug
-     * @param array $filters
-     * @return array
+     * Отримує доступні значення фільтрів із кількістю продуктів
+     * Включає параметри, якщо вибрана підкатегорія або застосовані параметри
+     * @param string $paramSlug Слаг параметра
+     * @param array $filters Активні фільтри
+     * @return array Масив значень фільтрів
      */
     public function getFilterValues(string $paramSlug, array $filters = []): array
     {
@@ -367,9 +377,7 @@ class FilterRepository implements FilterRepositoryInterface
             if ($hasSubcategory || $hasParameters) {
                 $paramResults = $this->processParameterFilterValues($paramSlug, $filters, $activeIds);
                 foreach ($paramResults as $paramResult) {
-                    $result[$paramResult['slug']]
-
-                        = $paramResult;
+                    $result[$paramResult['slug']] = $paramResult;
                 }
             }
 
@@ -383,11 +391,13 @@ class FilterRepository implements FilterRepositoryInterface
             return [];
         }
     }
+
     /**
-     * Log message with context.
-     * @param string $level
-     * @param string $message
-     * @param array $context
+     * Логує повідомлення з контекстом
+     * Використовує заданий рівень логування та додає назву класу до контексту
+     * @param string $level Рівень логування (debug, info, warning, error)
+     * @param string $message Повідомлення
+     * @param array $context Додатковий контекст
      */
     protected function log(string $level, string $message, array $context = []): void
     {
@@ -395,11 +405,12 @@ class FilterRepository implements FilterRepositoryInterface
     }
 
     /**
-     * Add Redis set keys for a single filter.
-     * @param array $setKeys
-     * @param string $filterSlug
-     * @param string $value
-     * @param string $expectedType
+     * Додає ключі Redis для одного фільтра
+     * Обробляє категорії, бренди або параметри, додаючи відповідні ключі до масиву
+     * @param array $setKeys Масив для зберігання ключів
+     * @param string $filterSlug Слаг фільтра
+     * @param string $value Значення фільтра
+     * @param string $expectedType Очікуваний тип фільтра (category, brand, parameters)
      */
     protected function addFilterSetKeys(array &$setKeys, string $filterSlug, string $value, string $expectedType): void
     {
@@ -481,11 +492,12 @@ class FilterRepository implements FilterRepositoryInterface
     }
 
     /**
-     * Build Redis set keys for a specific filter and additional filters.
-     * @param string $paramSlug
-     * @param string $value
-     * @param array $filters
-     * @return array
+     * Формує ключі Redis для певного фільтра та додаткових фільтрів
+     * Об’єднує ключі для категорій, брендів або параметрів
+     * @param string $paramSlug Слаг параметра
+     * @param string $value Значення фільтра
+     * @param array $filters Додаткові фільтри
+     * @return array Масив ключів Redis
      */
     protected function buildRedisSetKeys(string $paramSlug, string $value, array $filters): array
     {
@@ -527,9 +539,10 @@ class FilterRepository implements FilterRepositoryInterface
     }
 
     /**
-     * Build Redis set keys for all filters, combining multiple keys per type with SUNIONSTORE.
-     * @param array $filters
-     * @return array
+     * Формує ключі Redis для всіх фільтрів, об’єднуючи ключі одного типу через SUNIONSTORE
+     * Повертає унікальний масив ключів для використання в Redis
+     * @param array $filters Масив фільтрів
+     * @return array Масив ключів Redis
      */
     protected function buildRedisSetKeysForFilters(array $filters): array
     {

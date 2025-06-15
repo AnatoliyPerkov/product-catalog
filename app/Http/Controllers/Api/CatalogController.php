@@ -17,6 +17,11 @@ class CatalogController extends Controller
     protected FilterRepositoryInterface $filterRepository;
     protected ProductRepositoryInterface $productRepository;
 
+    /**
+     * Ініціалізує контролер із залежностями для роботи з фільтрами та продуктами
+     * @param FilterRepositoryInterface $filterRepository Репозиторій для роботи з фільтрами
+     * @param ProductRepositoryInterface $productRepository Репозиторій для роботи з продуктами
+     */
     public function __construct(FilterRepositoryInterface $filterRepository, ProductRepositoryInterface $productRepository)
     {
         $this->filterRepository = $filterRepository;
@@ -24,8 +29,10 @@ class CatalogController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Повертає доступні значення фільтрів на основі запиту
+     * Обробляє фільтри з параметрів запиту та повертає їх у форматі JSON
+     * @param Request $request HTTP-запит із параметрами фільтрів
+     * @return JsonResponse Відповідь із значеннями фільтрів або помилкою
      */
     public function filters(Request $request): JsonResponse
     {
@@ -52,8 +59,10 @@ class CatalogController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Повертає список продуктів із пагінацією на основі фільтрів та сортування
+     * Обробляє фільтри, сортування, сторінку та ліміт, повертає продукти з метаданими
+     * @param Request $request HTTP-запит із параметрами фільтрів, сортування та пагінації
+     * @return JsonResponse Відповідь із продуктами, метаданими або помилкою
      */
     public function products(Request $request): JsonResponse
     {

@@ -8,8 +8,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProductResource extends JsonResource
 {
     /**
-     * @param Request $request
-     * @return array
+     * Перетворює модель продукту в масив для JSON-відповіді
+     * Формує масив із ключовими полями продукту: ID, назва, ціна, опис
+     * @param Request $request HTTP-запит
+     * @return array Масив даних продукту
      */
     public function toArray($request)
     {
